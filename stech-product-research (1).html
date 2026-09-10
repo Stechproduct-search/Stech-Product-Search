@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stech Product Research</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white: #FFFFFF;
+    --paper: #FAFAF8;
+    --black: #121210;
+    --black-soft: #55534C;
+    --orange: #E8590C;
+    --orange-deep: #B8440A;
+    --orange-tint: #FDEEE3;
+    --rule: #E7E4DC;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--black); font-family: 'IBM Plex Sans', system-ui, sans-serif; line-height: 1.5; }
+
+  .topbar { background: var(--black); color: var(--white); padding: 18px 28px; display: flex; align-items: center; justify-content: space-between; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand .mark { width: 30px; height: 30px; background: var(--orange); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-size: 15px; color: var(--black); }
+  .brand .name { font-family: 'IBM Plex Mono', monospace; font-size: 17px; font-weight: 600; letter-spacing: -0.2px; }
+  .brand .sub { font-size: 12px; color: #B8B4A9; margin-top: 1px; }
+  .topbar button { background: none; border: 1px solid #38362F; color: var(--white); width: 38px; height: 38px; border-radius: 8px; cursor: pointer; font-size: 15px; transition: all .15s ease; }
+  .topbar button:hover { border-color: var(--orange); color: var(--orange); }
+  .topbar button:active { transform: scale(0.93); }
+
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 32px 24px 90px; }
+
+  .stats-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; margin-bottom: 22px; }
+  .stat-tile { background: var(--white); padding: 18px 20px; }
+  .stat-tile .num { font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 600; transition: color .2s ease; }
+  .stat-tile .label { font-size: 12px; color: var(--black-soft); margin-top: 2px; }
+
+  .insights-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 22px; }
+  @media (max-width: 780px) { .insights-row { grid-template-columns: 1fr; } .stats-strip { grid-template-columns: 1fr 1fr; } }
+  .mini-card { background: var(--white); border: 1px solid var(--rule); border-radius: 12px; padding: 18px 20px; }
+  .mini-card h3 { margin: 0 0 12px; font-size: 12.5px; color: var(--black-soft); font-weight: 600; }
+  .mini-row { display: flex; justify-content: space-between; padding: 7px 0; border-top: 1px solid var(--rule); font-size: 13.5px; }
+  .mini-row:first-of-type { border-top: none; }
+  .mini-row .name { font-family: 'IBM Plex Sans', sans-serif; }
+  .mini-row .val { font-family: 'IBM Plex Mono', monospace; color: var(--orange-deep); font-weight: 600; }
+  .mini-empty { color: var(--black-soft); font-size: 13px; padding: 6px 0; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+  @media (max-width: 780px) { .grid { grid-template-columns: 1fr; } }
+
+  .card { background: var(--white); border: 1px solid var(--rule); border-radius: 12px; padding: 24px; }
+  .card h2 { font-size: 13px; margin: 0 0 18px; color: var(--black-soft); font-weight: 600; }
+  label { display: block; font-size: 13px; color: var(--black-soft); margin-bottom: 6px; margin-top: 14px; }
+  label:first-of-type { margin-top: 0; }
+  input, select, textarea {
+    width: 100%; padding: 11px 12px; border: 1px solid var(--rule); border-radius: 8px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 14px; background: var(--paper); color: var(--black);
+    transition: border-color .15s ease;
+  }
+  textarea { font-family: 'IBM Plex Sans', sans-serif; resize: vertical; min-height: 60px; }
+  input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--orange); outline-offset: 1px; border-color: var(--orange); }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .hint { font-size: 12px; color: var(--orange-deep); margin-top: 6px; min-height: 14px; }
+
+  .adv-toggle {
+    margin-top: 16px; background: none; border: none; color: var(--orange-deep); font-size: 13px;
+    font-family: 'IBM Plex Sans', sans-serif; cursor: pointer; padding: 0; font-weight: 600;
+  }
+  .adv-panel { display: none; margin-top: 6px; border-top: 1px solid var(--rule); padding-top: 14px; }
+  .adv-panel.open { display: block; animation: fadeSlideUp .25s ease; }
+
+  button.primary {
+    margin-top: 20px; width: 100%; background: var(--orange); color: var(--white); border: none;
+    padding: 13px; border-radius: 8px; font-size: 15px; font-weight: 600; font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer; transition: background .15s ease, transform .1s ease;
+  }
+  button.primary:hover { background: var(--orange-deep); }
+  button.primary:active { transform: scale(0.98); }
+
+  .verdict-card { background: var(--black); color: var(--white); border: none; }
+  .verdict-card h2 { color: #9C9A91; }
+  .verdict-empty { color: #8A887F; font-size: 14px; padding: 34px 0; text-align: center; }
+
+  .verdict-badge { display: inline-flex; align-items: center; gap: 8px; padding: 7px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; font-family: 'IBM Plex Mono', monospace; }
+  .verdict-badge.good { background: var(--orange); color: var(--white); }
+  .verdict-badge.mid { background: transparent; color: var(--orange); border: 1px solid var(--orange); }
+  .verdict-badge.bad { background: #2A2924; color: #C8C6BC; }
+  .cat-pill { display: inline-block; margin-left: 8px; font-size: 11.5px; color: #B8B4A9; font-family: 'IBM Plex Sans', sans-serif; }
+
+  .stat-row { display: flex; gap: 24px; margin: 18px 0 14px; flex-wrap: wrap; }
+  .stat-row .num { font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 600; color: var(--white); }
+  .stat-row .label { font-size: 12px; color: #9C9A91; }
+
+  .reasons { list-style: none; margin: 14px 0 0; padding: 0; }
+  .reasons li { padding: 9px 0; border-top: 1px solid #2A2924; font-size: 13.5px; display: flex; gap: 8px; color: #D9D7CC; }
+  .reasons li span.mark { flex-shrink: 0; font-family: 'IBM Plex Mono', monospace; color: var(--orange); }
+  .saved-tag { margin-top: 16px; font-size: 12.5px; color: #9C9A91; display: flex; align-items: center; gap: 6px; }
+  .saved-tag .check { color: var(--orange); font-family: 'IBM Plex Mono', monospace; }
+  #verdictBody.reveal { animation: fadeSlideUp .35s ease; }
+
+  .table-card { background: var(--white); border: 1px solid var(--rule); border-radius: 12px; overflow: hidden; }
+  .table-head { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid var(--rule); flex-wrap: wrap; gap: 10px; }
+  .table-head h2 { margin: 0; font-size: 13px; color: var(--black-soft); font-weight: 600; }
+  .table-actions { display: flex; gap: 10px; }
+  .ghost-btn { background: none; border: 1px solid var(--rule); border-radius: 7px; padding: 8px 14px; font-size: 13px; font-family: 'IBM Plex Sans', sans-serif; cursor: pointer; color: var(--black); transition: all .15s ease; }
+  .ghost-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .ghost-btn:active { transform: scale(0.97); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead th { text-align: left; padding: 11px 16px; font-weight: 500; color: var(--black-soft); border-bottom: 1px solid var(--rule); font-size: 12.5px; cursor: pointer; white-space: nowrap; }
+  thead th:hover { color: var(--orange); }
+  tbody td { padding: 13px 16px; border-bottom: 1px solid var(--rule); font-family: 'IBM Plex Mono', monospace; white-space: nowrap; }
+  tbody td.name-cell { font-family: 'IBM Plex Sans', sans-serif; white-space: normal; max-width: 200px; cursor: pointer; }
+  tbody tr.main-row { cursor: pointer; }
+  tbody tr:hover.main-row { background: var(--orange-tint); }
+  tbody tr.row-enter { animation: rowIn .6s ease; }
+  .badge-sm { display: inline-flex; align-items: center; padding: 3px 11px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .badge-sm.good { background: var(--orange); color: var(--white); }
+  .badge-sm.mid { background: var(--orange-tint); color: var(--orange-deep); border: 1px solid var(--orange); }
+  .badge-sm.bad { background: #EFEEEA; color: var(--black-soft); }
+  .status-pill { font-family: 'IBM Plex Sans', sans-serif; font-size: 11.5px; padding: 3px 9px; border-radius: 20px; background: var(--paper); border: 1px solid var(--rule); color: var(--black-soft); }
+  .del-btn { background: none; border: none; color: var(--black-soft); cursor: pointer; font-size: 13px; font-family: 'IBM Plex Sans', sans-serif; }
+  .del-btn:hover { color: var(--orange-deep); }
+  .empty-state { padding: 54px 20px; text-align: center; color: var(--black-soft); font-size: 14px; }
+  .chev { display: inline-block; transition: transform .2s ease; color: var(--black-soft); margin-right: 4px; }
+  .chev.open { transform: rotate(90deg); }
+
+  .detail-row td { background: var(--paper); font-family: 'IBM Plex Sans', sans-serif; white-space: normal; }
+  .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; padding: 6px 4px; animation: fadeSlideUp .25s ease; }
+  .detail-block .k { font-size: 11.5px; color: var(--black-soft); margin-bottom: 3px; }
+  .detail-block .v { font-size: 13px; }
+  .detail-actions { grid-column: 1 / -1; display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+  .detail-actions button { padding: 8px 14px; font-size: 12.5px; border-radius: 7px; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; transition: all .15s ease; }
+  .detail-actions button:active { transform: scale(0.96); }
+  .approve-btn { border: 1px solid var(--orange); background: var(--white); color: var(--orange-deep); }
+  .approve-btn.approved { background: var(--orange); color: var(--white); }
+  .wa-btn { border: 1px solid var(--rule); background: var(--white); color: var(--black); }
+  .print-btn { border: 1px solid var(--rule); background: var(--white); color: var(--black); }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(18,18,16,0.55); align-items: center; justify-content: center; z-index: 50; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--white); border-radius: 14px; max-width: 540px; width: 100%; max-height: 85vh; overflow-y: auto; padding: 28px; animation: modalIn .22s ease; }
+  .modal h3 { margin-top: 0; font-family: 'IBM Plex Mono', monospace; font-size: 18px; }
+  .modal p { font-size: 13.5px; color: var(--black-soft); }
+  .modal code { display: block; background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 13px; font-size: 12px; white-space: pre-wrap; margin: 10px 0; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; margin: 18px 0 8px; }
+  .modal-close { text-align: right; }
+  .modal-close button { background: none; border: none; font-size: 14px; color: var(--black-soft); cursor: pointer; }
+  .sync-status { font-size: 12px; color: var(--black-soft); margin-top: 10px; }
+  .btn-row { display: flex; gap: 10px; margin-top: 14px; }
+  .btn-row button { flex: 1; margin-top: 0; }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 8px); background: var(--black); color: #fff; padding: 11px 20px; border-radius: 8px; font-size: 13.5px; opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes rowIn { from { opacity: 0; background: var(--orange-tint); } to { opacity: 1; } }
+  @keyframes modalIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">
+    <div class="mark">S</div>
+    <div>
+      <div class="name">Stech Product Research</div>
+      <div class="sub">Dropshipping viability, checked in one click</div>
+    </div>
+  </div>
+  <button id="settingsBtn" title="Settings">⚙</button>
+</div>
+
+<div class="wrap">
+  <div class="stats-strip">
+    <div class="stat-tile"><div class="num" id="statTotal">0</div><div class="label">products checked</div></div>
+    <div class="stat-tile"><div class="num" id="statGood">0</div><div class="label">strong picks</div></div>
+    <div class="stat-tile"><div class="num" id="statMargin">—</div><div class="label">average margin</div></div>
+    <div class="stat-tile"><div class="num" id="statWeek">0</div><div class="label">added this week</div></div>
+  </div>
+
+  <div class="insights-row">
+    <div class="mini-card">
+      <h3>Top categories</h3>
+      <div id="catBreakdown"><div class="mini-empty">Add a few products to see this.</div></div>
+    </div>
+    <div class="mini-card">
+      <h3>Top sourcing priority</h3>
+      <div id="topSourcing"><div class="mini-empty">Strong picks with low saturation will appear here.</div></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Check a product</h2>
+      <label for="name">Product name</label>
+      <input id="name" type="text" placeholder="e.g. Magnetic fridge spice rack">
+      <div class="hint" id="categoryHint"></div>
+
+      <div class="row2">
+        <div>
+          <label for="wholesale">Wholesale price ($)</label>
+          <input id="wholesale" type="number" min="0" step="0.01" placeholder="4.50">
+        </div>
+        <div>
+          <label for="sell">Sell price ($)</label>
+          <input id="sell" type="number" min="0" step="0.01" placeholder="19.99">
+        </div>
+      </div>
+
+      <div class="row2">
+        <div>
+          <label for="weight">Weight in grams <span style="opacity:.6">(optional)</span></label>
+          <input id="weight" type="number" min="0" placeholder="180">
+        </div>
+        <div>
+          <label for="saturation">Competitor saturation</label>
+          <select id="saturation">
+            <option value="">Not sure</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div>
+          <label for="adCost">Est. ad cost / sale ($) <span style="opacity:.6">(optional)</span></label>
+          <input id="adCost" type="number" min="0" step="0.01" placeholder="6.00">
+        </div>
+        <div>
+          <label for="status">Status</label>
+          <select id="status">
+            <option>New</option>
+            <option>Testing</option>
+            <option>Sourcing</option>
+            <option>Live</option>
+            <option>Rejected</option>
+          </select>
+        </div>
+      </div>
+
+      <label for="addedBy">Added by</label>
+      <input id="addedBy" type="text" placeholder="Your name">
+
+      <button type="button" class="adv-toggle" id="advToggle">+ Listing details (optional, for when you're ready to list)</button>
+      <div class="adv-panel" id="advPanel">
+        <label for="category">Category override <span style="opacity:.6">(leave as Auto — we'll detect it)</span></label>
+        <select id="category">
+          <option value="">Auto-detect</option>
+          <option>Home & Office</option>
+          <option>Kitchen</option>
+          <option>Pet Accessories</option>
+          <option>Beauty & Personal Care</option>
+          <option>Tech Accessories & Electronics</option>
+          <option>Toys & Kids</option>
+          <option>Drinkware</option>
+          <option>Seasonal & Cooling</option>
+          <option>Apparel & Accessories</option>
+          <option>Other</option>
+        </select>
+        <label for="attributes">Key attributes</label>
+        <input id="attributes" type="text" placeholder="Color: Black, Material: ABS, Size: M">
+        <label for="description">Short description</label>
+        <textarea id="description" placeholder="What it does, who it's for..."></textarea>
+        <label for="supplierLink">Supplier / source link</label>
+        <input id="supplierLink" type="text" placeholder="https://...">
+        <label for="sku">SKU / reference code</label>
+        <input id="sku" type="text" placeholder="SP-0021">
+        <label for="notes">Internal notes</label>
+        <textarea id="notes" placeholder="Anything your team should know"></textarea>
+      </div>
+
+      <button class="primary" id="addBtn">Add product</button>
+    </div>
+
+    <div class="card verdict-card" id="verdictCard">
+      <h2>Verdict</h2>
+      <div class="verdict-empty" id="verdictEmpty">Fill in the form and hit "Add product" — it's checked and saved to the shared list in one step.</div>
+      <div id="verdictBody" style="display:none">
+        <span class="verdict-badge" id="verdictBadge"><span id="verdictText"></span></span>
+        <span class="cat-pill" id="catPill"></span>
+        <div class="stat-row">
+          <div><div class="num" id="marginNum">—</div><div class="label">margin</div></div>
+          <div><div class="num" id="profitNum">—</div><div class="label">profit / unit</div></div>
+          <div id="netProfitStat" style="display:none"><div class="num" id="netProfitNum">—</div><div class="label">net after ads</div></div>
+        </div>
+        <ul class="reasons" id="reasonsList"></ul>
+        <div class="saved-tag"><span class="check">✓</span> Saved to the shared list below</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-head">
+      <h2 id="countLabel">Saved products (0)</h2>
+      <div class="table-actions">
+        <button class="ghost-btn" id="exportBtn">Export CSV</button>
+      </div>
+    </div>
+    <div id="tableWrap">
+      <div class="empty-state" id="emptyState">No products saved yet. Add one above — it'll show up here for your whole team.</div>
+      <table id="dataTable" style="display:none">
+        <thead>
+          <tr>
+            <th></th>
+            <th data-sort="name">Product</th>
+            <th data-sort="category">Category</th>
+            <th data-sort="margin">Margin</th>
+            <th data-sort="verdict">Verdict</th>
+            <th data-sort="status">Status</th>
+            <th data-sort="addedBy">Added by</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal">
+    <div class="modal-close"><button id="closeSettings">Close</button></div>
+    <h3>Sync to Google Sheets</h3>
+    <p>This list is already shared with your whole team automatically. To also send every saved product into a real Google Sheet in real time, connect a free Google Apps Script endpoint — a one-time, five-minute setup.</p>
+    <p><strong>1.</strong> Open a Google Sheet → Extensions → Apps Script, and paste in:</p>
+    <code>function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var d = JSON.parse(e.postData.contents);
+  sheet.appendRow([new Date(), d.name, d.category, d.wholesalePrice, d.sellPrice, d.margin, d.profit, d.verdict, d.status, d.addedBy, d.sku, d.attributes, d.supplierLink]);
+  return ContentService.createTextOutput(JSON.stringify({ok:true}))
+    .setMimeType(ContentService.MimeType.JSON);
+}</code>
+    <p><strong>2.</strong> Deploy → New deployment → type "Web app" → execute as "Me" → who has access "Anyone" → Deploy. Copy the web app URL.</p>
+    <p><strong>3.</strong> Paste that URL below, save, then test it.</p>
+    <label for="sheetUrl">Google Apps Script Web App URL</label>
+    <input id="sheetUrl" type="text" placeholder="https://script.google.com/macros/s/.../exec">
+    <div class="toggle-row">
+      <label style="margin:0">Send new saves to this sheet automatically</label>
+      <input type="checkbox" id="syncToggle" style="width:auto">
+    </div>
+    <div class="btn-row">
+      <button class="primary" id="saveSettingsBtn">Save settings</button>
+      <button class="ghost-btn" id="testSyncBtn" style="border-radius:8px">Test connection</button>
+    </div>
+    <div class="sync-status" id="syncStatus"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORE_KEY = 'stech-product-list';
+const SETTINGS_KEY = 'stech-sheet-settings';
+const NAME_KEY = 'stech-user-name';
+let products = [];
+let settings = { url: '', enabled: false };
+let sortState = { key: 'margin', dir: 'desc' };
+let expandedIds = new Set();
+let lastAddedId = null;
+
+const COMPLIANCE_CATEGORIES = ['Toys & Kids', 'Tech Accessories & Electronics'];
+
+const CATEGORY_RULES = [
+  { cat: 'Toys & Kids', kws: ['toy','kids','baby','infant','children'] },
+  { cat: 'Pet Accessories', kws: ['pet','dog','cat','paw','leash','collar','litter'] },
+  { cat: 'Kitchen', kws: ['kitchen','spice','food storage','container','sealer','cutting board','utensil','bag clip','tumbler set'] },
+  { cat: 'Beauty & Personal Care', kws: ['skincare','beauty','hair','nail','massage','gua sha','facial','makeup','lash','skin'] },
+  { cat: 'Drinkware', kws: ['tumbler','bottle','flask','mug','cup'] },
+  { cat: 'Seasonal & Cooling', kws: ['fan','cooling','ice roller','cooling towel'] },
+  { cat: 'Apparel & Accessories', kws: ['shirt','dress','jewelry','necklace','bracelet','sock','hat','scarf','bag'] },
+  { cat: 'Tech Accessories & Electronics', kws: ['charger','cable','wireless','bluetooth','earbud','electronic','battery','usb','led','lamp','vacuum','projector','speaker','printer'] },
+  { cat: 'Home & Office', kws: ['organizer','desk','monitor','storage','shelf','rack','cleaner','home','riser'] },
+];
+
+function guessCategory(name) {
+  const n = (name || '').toLowerCase();
+  for (const r of CATEGORY_RULES) {
+    if (r.kws.some(k => n.includes(k))) return r.cat;
+  }
+  return 'Other';
+}
+
+function fmtMoney(n) { return '$' + n.toFixed(2); }
+function fmtPct(n) { return n.toFixed(1) + '%'; }
+
+function evaluate(inp) {
+  const { wholesale, sell, weight, saturation, adCost, categoryOverride, name } = inp;
+  const profit = sell - wholesale;
+  const margin = sell > 0 ? (profit / sell) * 100 : 0;
+  const category = categoryOverride || guessCategory(name);
+  let score = 0;
+  const reasons = [];
+
+  if (margin >= 60) { score += 2; reasons.push({ok:true, text:`Margin is ${fmtPct(margin)} — well above the 60% target for a solid dropshipping buffer.`}); }
+  else if (margin >= 45) { score += 1; reasons.push({ok:true, text:`Margin is ${fmtPct(margin)} — workable, but thinner once ad spend and returns are factored in.`}); }
+  else if (margin >= 30) { reasons.push({ok:false, text:`Margin is only ${fmtPct(margin)} — leaves little room after ads, fees, and returns.`}); }
+  else { score -= 2; reasons.push({ok:false, text:`Margin is ${fmtPct(margin)} — too thin to be worth the operational effort.`}); }
+
+  if (sell >= 15 && sell <= 45) { score += 1; reasons.push({ok:true, text:`Sell price of ${fmtMoney(sell)} sits in the $15–$45 impulse-buy sweet spot.`}); }
+  else if (sell < 15) { reasons.push({ok:false, text:`Sell price of ${fmtMoney(sell)} is quite low — profit per unit may be too small to scale with ads.`}); }
+  else { reasons.push({ok:false, text:`Sell price of ${fmtMoney(sell)} is above the typical impulse-buy range — expect more buyer hesitation.`}); }
+
+  if (weight) {
+    if (weight <= 500) { score += 1; reasons.push({ok:true, text:`Weight (${weight}g) is light — keeps shipping cost and breakage risk low.`}); }
+    else { reasons.push({ok:false, text:`Weight (${weight}g) is on the heavier side — check shipping cost eats into that margin.`}); }
+  }
+
+  if (saturation === 'Low') { score += 1; reasons.push({ok:true, text:`Low competitor saturation — easier to stand out early.`}); }
+  else if (saturation === 'High') { score -= 1; reasons.push({ok:false, text:`High competitor saturation — expect to compete mainly on price and ad spend.`}); }
+
+  let netProfit = null;
+  if (adCost !== null && !isNaN(adCost)) {
+    netProfit = profit - adCost;
+    if (netProfit <= 0) { score -= 2; reasons.push({ok:false, text:`After a ${fmtMoney(adCost)} ad cost per sale, this isn't profitable (net ${fmtMoney(netProfit)}).`}); }
+    else { reasons.push({ok:true, text:`Still nets ${fmtMoney(netProfit)} per sale after estimated ad spend.`}); }
+  }
+
+  if (COMPLIANCE_CATEGORIES.includes(category)) {
+    reasons.push({ok:false, text:`${category} often needs extra certification (CPSIA/CE/UL or battery UN38.3) — budget for testing and documentation before listing.`});
+  }
+
+  let verdict, tier;
+  if (score >= 3) { verdict = 'Strong pick'; tier = 'good'; }
+  else if (score >= 1) { verdict = 'Workable'; tier = 'mid'; }
+  else { verdict = 'Not recommended'; tier = 'bad'; }
+
+  return { profit, netProfit, margin, tier, verdict, reasons, category };
+}
+
+function renderVerdict(result) {
+  document.getElementById('verdictEmpty').style.display = 'none';
+  const body = document.getElementById('verdictBody');
+  body.style.display = 'block';
+  body.classList.remove('reveal'); void body.offsetWidth; body.classList.add('reveal');
+
+  const badge = document.getElementById('verdictBadge');
+  badge.className = 'verdict-badge ' + result.tier;
+  document.getElementById('verdictText').textContent = result.verdict;
+  document.getElementById('catPill').textContent = result.category;
+  document.getElementById('marginNum').textContent = fmtPct(result.margin);
+  document.getElementById('profitNum').textContent = fmtMoney(result.profit);
+  const netStat = document.getElementById('netProfitStat');
+  if (result.netProfit !== null) { netStat.style.display = 'block'; document.getElementById('netProfitNum').textContent = fmtMoney(result.netProfit); }
+  else { netStat.style.display = 'none'; }
+
+  const list = document.getElementById('reasonsList');
+  list.innerHTML = '';
+  result.reasons.forEach(r => {
+    const li = document.createElement('li');
+    li.innerHTML = `<span class="mark">${r.ok ? '+' : '−'}</span><span>${r.text}</span>`;
+    list.appendChild(li);
+  });
+}
+
+document.getElementById('name').addEventListener('input', (e) => {
+  const catSelect = document.getElementById('category');
+  const hint = document.getElementById('categoryHint');
+  if (catSelect.value) { hint.textContent = ''; return; }
+  const v = e.target.value.trim();
+  hint.textContent = v ? `Detected category: ${guessCategory(v)}` : '';
+});
+
+document.getElementById('advToggle').addEventListener('click', () => {
+  const panel = document.getElementById('advPanel');
+  panel.classList.toggle('open');
+});
+
+document.getElementById('addBtn').addEventListener('click', async () => {
+  const name = document.getElementById('name').value.trim();
+  const wholesale = parseFloat(document.getElementById('wholesale').value);
+  const sell = parseFloat(document.getElementById('sell').value);
+  const weight = parseFloat(document.getElementById('weight').value) || null;
+  const saturation = document.getElementById('saturation').value;
+  const adCostRaw = document.getElementById('adCost').value;
+  const adCost = adCostRaw === '' ? null : parseFloat(adCostRaw);
+  const status = document.getElementById('status').value;
+  const addedBy = document.getElementById('addedBy').value.trim();
+  const categoryOverride = document.getElementById('category').value;
+  const attributes = document.getElementById('attributes').value.trim();
+  const description = document.getElementById('description').value.trim();
+  const supplierLink = document.getElementById('supplierLink').value.trim();
+  const sku = document.getElementById('sku').value.trim();
+  const notes = document.getElementById('notes').value.trim();
+
+  if (!name || isNaN(wholesale) || isNaN(sell) || sell <= 0) {
+    showToast('Enter a product name, wholesale price, and sell price first.');
+    return;
+  }
+
+  const result = evaluate({ wholesale, sell, weight, saturation, adCost, categoryOverride, name });
+  renderVerdict(result);
+
+  const record = {
+    id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
+    name, wholesalePrice: wholesale, sellPrice: sell, weight, saturation, adCost,
+    status, addedBy, attributes, description, supplierLink, sku, notes,
+    approved: false, createdAt: new Date().toISOString(),
+    ...result
+  };
+  products.unshift(record);
+  lastAddedId = record.id;
+  await persist();
+  renderTable();
+  renderStats();
+  renderInsights();
+  if (settings.enabled && settings.url) syncToSheet(record);
+  showToast('Checked and saved to the list.');
+
+  if (addedBy) { try { await window.storage.set(NAME_KEY, addedBy, false); } catch (e) {} }
+
+  document.getElementById('name').value = '';
+  document.getElementById('wholesale').value = '';
+  document.getElementById('sell').value = '';
+  document.getElementById('weight').value = '';
+  document.getElementById('adCost').value = '';
+  document.getElementById('attributes').value = '';
+  document.getElementById('description').value = '';
+  document.getElementById('supplierLink').value = '';
+  document.getElementById('sku').value = '';
+  document.getElementById('notes').value = '';
+  document.getElementById('categoryHint').textContent = '';
+});
+
+async function persist() {
+  try { await window.storage.set(STORE_KEY, JSON.stringify(products), true); }
+  catch (err) { console.error('Storage error', err); showToast('Could not save — storage error.'); }
+}
+
+async function loadProducts() {
+  try {
+    const res = await window.storage.get(STORE_KEY, true);
+    products = res && res.value ? JSON.parse(res.value) : [];
+  } catch (err) { products = []; }
+  renderTable(); renderStats(); renderInsights();
+}
+
+async function loadSettings() {
+  try {
+    const res = await window.storage.get(SETTINGS_KEY, false);
+    if (res && res.value) settings = JSON.parse(res.value);
+  } catch (err) {}
+  document.getElementById('sheetUrl').value = settings.url || '';
+  document.getElementById('syncToggle').checked = !!settings.enabled;
+  updateSyncStatus();
+
+  try {
+    const nameRes = await window.storage.get(NAME_KEY, false);
+    if (nameRes && nameRes.value) document.getElementById('addedBy').value = nameRes.value;
+  } catch (err) {}
+}
+
+function updateSyncStatus() {
+  document.getElementById('syncStatus').textContent = settings.enabled && settings.url ? 'Sync is on — new saves are sent to your sheet automatically.' : 'Sync is off.';
+}
+
+async function syncToSheet(record) {
+  try {
+    await fetch(settings.url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify(record) });
+  } catch (err) { console.error('Sheet sync failed', err); }
+}
+
+function renderStats() {
+  document.getElementById('statTotal').textContent = products.length;
+  document.getElementById('statGood').textContent = products.filter(p => p.tier === 'good').length;
+  document.getElementById('statMargin').textContent = products.length ? fmtPct(products.reduce((s,p) => s + p.margin, 0) / products.length) : '—';
+  const weekAgo = Date.now() - 7*24*60*60*1000;
+  document.getElementById('statWeek').textContent = products.filter(p => new Date(p.createdAt).getTime() >= weekAgo).length;
+}
+
+function renderInsights() {
+  const catCounts = {};
+  products.forEach(p => { const c = p.category || 'Other'; catCounts[c] = (catCounts[c] || 0) + 1; });
+  const catList = Object.entries(catCounts).sort((a,b) => b[1]-a[1]).slice(0,5);
+  const catEl = document.getElementById('catBreakdown');
+  catEl.innerHTML = catList.length ? catList.map(([c,n]) => `<div class="mini-row"><span class="name">${escapeHtml(c)}</span><span class="val">${n}</span></div>`).join('') : '<div class="mini-empty">Add a few products to see this.</div>';
+
+  const top = products.filter(p => p.tier === 'good').sort((a,b) => {
+    const satRank = s => s === 'Low' ? 0 : s === 'Medium' ? 1 : s === 'High' ? 2 : 1;
+    if (satRank(a.saturation) !== satRank(b.saturation)) return satRank(a.saturation) - satRank(b.saturation);
+    return b.margin - a.margin;
+  }).slice(0,5);
+  const topEl = document.getElementById('topSourcing');
+  topEl.innerHTML = top.length ? top.map(p => `<div class="mini-row"><span class="name">${escapeHtml(p.name)}</span><span class="val">${fmtPct(p.margin)}</span></div>`).join('') : '<div class="mini-empty">Strong picks with low saturation will appear here.</div>';
+}
+
+function renderTable() {
+  const tbody = document.getElementById('tableBody');
+  const table = document.getElementById('dataTable');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('countLabel').textContent = `Saved products (${products.length})`;
+
+  if (products.length === 0) { table.style.display = 'none'; empty.style.display = 'block'; return; }
+  table.style.display = 'table'; empty.style.display = 'none';
+
+  const sorted = [...products].sort((a, b) => {
+    let av = a[sortState.key], bv = b[sortState.key];
+    if (typeof av === 'string') { av = (av||'').toLowerCase(); bv = (bv||'').toLowerCase(); }
+    if (av === undefined || av === null) av = '';
+    if (bv === undefined || bv === null) bv = '';
+    if (av < bv) return sortState.dir === 'asc' ? -1 : 1;
+    if (av > bv) return sortState.dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  tbody.innerHTML = '';
+  sorted.forEach(p => {
+    const isOpen = expandedIds.has(p.id);
+    const tr = document.createElement('tr');
+    tr.className = 'main-row' + (p.id === lastAddedId ? ' row-enter' : '');
+    tr.innerHTML = `
+      <td><span class="chev ${isOpen ? 'open':''}">›</span></td>
+      <td class="name-cell">${escapeHtml(p.name)}</td>
+      <td>${escapeHtml(p.category || 'Other')}</td>
+      <td>${fmtPct(p.margin)}</td>
+      <td><span class="badge-sm ${p.tier}">${p.verdict}</span></td>
+      <td><span class="status-pill">${escapeHtml(p.status || 'New')}</span></td>
+      <td>${escapeHtml(p.addedBy || '—')}</td>
+      <td><button class="del-btn" data-id="${p.id}">Remove</button></td>
+    `;
+    tr.querySelectorAll('td').forEach((td, i) => { if (i !== 7) td.addEventListener('click', (ev) => { if (ev.target.tagName !== 'BUTTON') toggleExpand(p.id); }); });
+    tbody.appendChild(tr);
+
+    if (isOpen) {
+      const dtr = document.createElement('tr');
+      dtr.className = 'detail-row';
+      dtr.innerHTML = `<td colspan="8"><div class="detail-grid">
+        <div class="detail-block"><div class="k">Wholesale → Sell</div><div class="v">${fmtMoney(p.wholesalePrice)} → ${fmtMoney(p.sellPrice)}</div></div>
+        <div class="detail-block"><div class="k">Profit / unit</div><div class="v">${fmtMoney(p.profit)}${p.netProfit !== null && p.netProfit !== undefined ? ' (' + fmtMoney(p.netProfit) + ' after ads)' : ''}</div></div>
+        <div class="detail-block"><div class="k">Weight</div><div class="v">${p.weight ? p.weight + 'g' : '—'}</div></div>
+        <div class="detail-block"><div class="k">Saturation</div><div class="v">${p.saturation || '—'}</div></div>
+        <div class="detail-block"><div class="k">SKU</div><div class="v">${escapeHtml(p.sku || '—')}</div></div>
+        <div class="detail-block"><div class="k">Attributes</div><div class="v">${escapeHtml(p.attributes || '—')}</div></div>
+        <div class="detail-block" style="grid-column: span 2"><div class="k">Description</div><div class="v">${escapeHtml(p.description || '—')}</div></div>
+        <div class="detail-block" style="grid-column: span 2"><div class="k">Supplier link</div><div class="v">${p.supplierLink ? `<a href="${escapeHtml(p.supplierLink)}" target="_blank" rel="noopener">${escapeHtml(p.supplierLink)}</a>` : '—'}</div></div>
+        <div class="detail-block" style="grid-column: 1 / -1"><div class="k">Notes</div><div class="v">${escapeHtml(p.notes || '—')}</div></div>
+        <div class="detail-actions">
+          <button class="approve-btn ${p.approved ? 'approved' : ''}" data-approve="${p.id}">${p.approved ? '✓ Approved' : 'Approve'}</button>
+          <button class="wa-btn" data-wa="${p.id}">Share via WhatsApp</button>
+          <button class="print-btn" data-print="${p.id}">Print report</button>
+        </div>
+      </div></td>`;
+      tbody.appendChild(dtr);
+    }
+  });
+  lastAddedId = null;
+
+  tbody.querySelectorAll('.del-btn').forEach(btn => btn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    products = products.filter(p => p.id !== btn.dataset.id);
+    expandedIds.delete(btn.dataset.id);
+    await persist(); renderTable(); renderStats(); renderInsights();
+    showToast('Removed.');
+  }));
+  tbody.querySelectorAll('[data-approve]').forEach(btn => btn.addEventListener('click', async () => {
+    const p = products.find(x => x.id === btn.dataset.approve);
+    if (p) { p.approved = !p.approved; await persist(); renderTable(); showToast(p.approved ? 'Marked approved.' : 'Approval removed.'); }
+  }));
+  tbody.querySelectorAll('[data-wa]').forEach(btn => btn.addEventListener('click', () => {
+    const p = products.find(x => x.id === btn.dataset.wa);
+    if (!p) return;
+    const text = `${p.name}\nVerdict: ${p.verdict} (${fmtPct(p.margin)} margin)\nWholesale ${fmtMoney(p.wholesalePrice)} → Sell ${fmtMoney(p.sellPrice)}\nCategory: ${p.category}${p.supplierLink ? '\nSupplier: ' + p.supplierLink : ''}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  }));
+  tbody.querySelectorAll('[data-print]').forEach(btn => btn.addEventListener('click', () => {
+    const p = products.find(x => x.id === btn.dataset.print);
+    if (!p) return;
+    const w = window.open('', '_blank');
+    w.document.write(`
+      <html><head><title>${escapeHtml(p.name)} — Stech Product Research</title>
+      <style>body{font-family:sans-serif;padding:40px;color:#121210} h1{font-size:22px} .row{margin:8px 0} .k{color:#666;font-size:12px} table{border-collapse:collapse;width:100%;margin-top:16px} td{padding:6px 0;border-top:1px solid #eee}</style>
+      </head><body>
+      <h1>${escapeHtml(p.name)}</h1>
+      <div class="row"><span class="k">Verdict:</span> ${p.verdict} — ${fmtPct(p.margin)} margin</div>
+      <table>
+        <tr><td class="k">Category</td><td>${escapeHtml(p.category)}</td></tr>
+        <tr><td class="k">Wholesale price</td><td>${fmtMoney(p.wholesalePrice)}</td></tr>
+        <tr><td class="k">Sell price</td><td>${fmtMoney(p.sellPrice)}</td></tr>
+        <tr><td class="k">Profit / unit</td><td>${fmtMoney(p.profit)}</td></tr>
+        <tr><td class="k">Weight</td><td>${p.weight ? p.weight + 'g' : '—'}</td></tr>
+        <tr><td class="k">Saturation</td><td>${p.saturation || '—'}</td></tr>
+        <tr><td class="k">SKU</td><td>${escapeHtml(p.sku || '—')}</td></tr>
+        <tr><td class="k">Attributes</td><td>${escapeHtml(p.attributes || '—')}</td></tr>
+        <tr><td class="k">Description</td><td>${escapeHtml(p.description || '—')}</td></tr>
+        <tr><td class="k">Supplier link</td><td>${escapeHtml(p.supplierLink || '—')}</td></tr>
+        <tr><td class="k">Status</td><td>${escapeHtml(p.status || 'New')}</td></tr>
+        <tr><td class="k">Added by</td><td>${escapeHtml(p.addedBy || '—')}</td></tr>
+      </table>
+      </body></html>`);
+    w.document.close();
+    setTimeout(() => w.print(), 300);
+  }));
+}
+
+function toggleExpand(id) {
+  if (expandedIds.has(id)) expandedIds.delete(id); else expandedIds.add(id);
+  renderTable();
+}
+
+document.querySelectorAll('th[data-sort]').forEach(th => th.addEventListener('click', () => {
+  const key = th.dataset.sort;
+  if (sortState.key === key) sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+  else { sortState.key = key; sortState.dir = 'desc'; }
+  renderTable();
+}));
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+  if (products.length === 0) { showToast('Nothing to export yet.'); return; }
+  const headers = ['Name','Category','Wholesale Price','Sell Price','Margin %','Profit','Net Profit After Ads','Verdict','Status','Added By','Weight (g)','Saturation','SKU','Attributes','Description','Supplier Link','Notes','Approved','Saved At'];
+  const rows = products.map(p => [p.name, p.category, p.wholesalePrice, p.sellPrice, p.margin.toFixed(1), p.profit.toFixed(2), p.netProfit !== null && p.netProfit !== undefined ? p.netProfit.toFixed(2) : '', p.verdict, p.status, p.addedBy, p.weight || '', p.saturation || '', p.sku || '', p.attributes || '', p.description || '', p.supplierLink || '', p.notes || '', p.approved ? 'Yes' : 'No', p.createdAt]);
+  const csv = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'stech-product-research.csv'; a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('settingsBtn').addEventListener('click', () => document.getElementById('settingsModal').classList.add('open'));
+document.getElementById('closeSettings').addEventListener('click', () => document.getElementById('settingsModal').classList.remove('open'));
+document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
+  settings.url = document.getElementById('sheetUrl').value.trim();
+  settings.enabled = document.getElementById('syncToggle').checked;
+  try { await window.storage.set(SETTINGS_KEY, JSON.stringify(settings), false); updateSyncStatus(); showToast('Settings saved.'); }
+  catch (err) { showToast('Could not save settings.'); }
+});
+document.getElementById('testSyncBtn').addEventListener('click', async () => {
+  const url = document.getElementById('sheetUrl').value.trim();
+  if (!url) { showToast('Paste your Apps Script URL first.'); return; }
+  try {
+    await fetch(url, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain' }, body: JSON.stringify({ name: 'Test product', category: 'Test', wholesalePrice: 1, sellPrice: 2, margin: 50, profit: 1, verdict: 'Test row', status: 'Test', addedBy: 'Test', sku:'', attributes:'', supplierLink:'' }) });
+    showToast('Test row sent — check your sheet for it.');
+  } catch (err) { showToast('Could not reach that URL.'); }
+});
+
+function escapeHtml(str) { const div = document.createElement('div'); div.textContent = str == null ? '' : str; return div.innerHTML; }
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2200); }
+
+loadProducts();
+loadSettings();
+</script>
+</body>
+</html>
